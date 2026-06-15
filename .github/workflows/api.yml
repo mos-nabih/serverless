@@ -5,6 +5,13 @@ on:
       - 'services/tasks_api/**'
       - '.github/workflows/api.yml'
 
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-east-1
+  APP_ENVIRONMENT: development
+  SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+
 jobs:
   test:
     strategy:
@@ -56,3 +63,35 @@ jobs:
         run: uv run ruff check .
       - name: Run bandit
         run: uv run bandit -r . -c pyproject.toml
+  deploy-development:
+    needs: [ test, code-quality ]
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.13]
+        node-version: [22]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: services/tasks_api
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Serverless Framework
+        run: npm install -g serverless
+      - name: Install NPM dependencies
+        run: npm install
+      - name: Export requirements
+        run: uv export --no-hashes > requirements.txt
+      - name: Deploy
+        run: sls deploy --stage development --verbose
