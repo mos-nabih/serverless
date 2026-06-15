@@ -1,0 +1,36 @@
+name: Destroy API resources
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type destroy-development to confirm'
+        required: true
+        type: string
+
+jobs:
+  destroy-api:
+    if: ${{ inputs.confirmation == 'destroy-development' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/tasks_api
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: us-east-1
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Install Serverless Framework
+        run: npm install --global serverless
+
+      - name: Remove development API
+        run: sls remove --stage development --region us-east-1 --verbose
