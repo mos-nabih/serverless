@@ -16,3 +16,17 @@ dev = [
     "pytest-cov>=7.1.0",
     "ruff>=0.15.17",
 ]
+
+[tool.ruff]
+line-length = 120
+exclude = [".git", "build", "dist", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "C90"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.bandit]
+exclude_dirs = [".venv"]
+skips = ["B101"]
