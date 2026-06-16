@@ -19,6 +19,22 @@ provider:
   logRetentionInDays: 30
   environment:
     APP_ENVIRONMENT: ${self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          # Allow only access to the API's table and its indexes
+          Resource:
+            - "Fn::GetAtt": [ TasksAPITable, Arn ]
+            - "Fn::Join": ['/', ["Fn::GetAtt": [ TasksAPITable, Arn ], 'index', '*']]
 
 functions:
   API:
@@ -32,3 +48,10 @@ functions:
           cors:
             origin: ${env:ALLOWED_ORIGINS}
             maxAge: 60
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  tableName: ${self:custom.stage}-tasks-api
+
+resources:
+  - ${file(resources/dynamodb.yml)}
