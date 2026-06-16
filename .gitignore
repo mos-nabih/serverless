@@ -227,3 +227,6 @@ __marimo__/
 .terraform.lock.hcl
 *.tfvars
 !terraform.tfvars.example
+
+# Node Modules
+node_modules/

@@ -3,6 +3,13 @@ service: tasks-api
 frameworkVersion: '4'
 useDotenv: true
 
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    fileName: requirements.txt
+
 
 provider:
   name: aws
