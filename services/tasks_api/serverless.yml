@@ -9,6 +9,8 @@ plugins:
 custom:
   pythonRequirements:
     fileName: requirements.txt
+  stage: ${opt:stage, self:provider.stage}
+  tableName: ${self:custom.stage}-tasks-api
 
 
 provider:
@@ -48,10 +50,6 @@ functions:
           cors:
             origin: ${env:ALLOWED_ORIGINS}
             maxAge: 60
-
-custom:
-  stage: ${opt:stage, self:provider.stage}
-  tableName: ${self:custom.stage}-tasks-api
 
 resources:
   - ${file(resources/dynamodb.yml)}
