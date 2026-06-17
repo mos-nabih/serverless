@@ -230,3 +230,6 @@ __marimo__/
 
 # Node Modules
 node_modules/
+
+# DynamoDB Local data
+services/tasks_api/docker/dynamodb/
