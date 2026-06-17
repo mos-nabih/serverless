@@ -52,4 +52,5 @@ functions:
             maxAge: 60
 
 resources:
+  - ${file(resources/cognito.yml)}
   - ${file(resources/dynamodb.yml)}
