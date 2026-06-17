@@ -11,6 +11,7 @@ env:
   AWS_DEFAULT_REGION: us-east-1
   APP_ENVIRONMENT: development
   SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+  VITE_VUE_APP_API_URL: https://it47dhmeci.execute-api.us-east-1.amazonaws.com/development/api
 
 
 jobs:
