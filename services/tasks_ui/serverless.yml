@@ -13,7 +13,7 @@ provider:
 
 custom:
   stage: ${opt:stage, self:provider.stage}
-  bucketName: ${self:custom.stage}-tasks-api
+  bucketName: ${self:custom.stage}-${aws:accountId}-tasks-api
 
 
 resources:
