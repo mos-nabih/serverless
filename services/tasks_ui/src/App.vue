@@ -91,39 +91,41 @@
           </el-form>
         </el-card>
 
-        <el-row :gutter="20" class="queue-grid">
-          <el-col :xs="24" :md="12">
-            <el-card class="queue-card">
-              <template #header>
-                <div class="card-header">
-                  <span>Open findings</span>
-                  <el-tag type="danger" effect="plain">{{ tasks.openTasks.length }}</el-tag>
-                </div>
-              </template>
-              <el-table :data="tasks.openTasks" empty-text="No open security findings">
-                <el-table-column prop="title" label="Finding" min-width="220" />
-                <el-table-column fixed="right" label="Action" width="150">
-                  <template #default="scope">
-                    <el-button link type="primary" size="large" @click="closeTask(scope.row.id)">Remediate</el-button>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </el-card>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-card class="queue-card">
-              <template #header>
-                <div class="card-header">
-                  <span>Remediated findings</span>
-                  <el-tag type="success" effect="plain">{{ tasks.closedTasks.length }}</el-tag>
-                </div>
-              </template>
-              <el-table :data="tasks.closedTasks" empty-text="No remediated findings yet">
-                <el-table-column prop="title" label="Finding" />
-              </el-table>
-            </el-card>
-          </el-col>
-        </el-row>
+        <div class="queue-grid">
+          <el-row :gutter="20">
+            <el-col :xs="24" :md="12">
+              <el-card class="queue-card">
+                <template #header>
+                  <div class="card-header">
+                    <span>Open findings</span>
+                    <el-tag type="danger" effect="plain">{{ tasks.openTasks.length }}</el-tag>
+                  </div>
+                </template>
+                <el-table :data="tasks.openTasks" empty-text="No open security findings">
+                  <el-table-column prop="title" label="Finding" min-width="220" />
+                  <el-table-column fixed="right" label="Action" width="150">
+                    <template #default="scope">
+                      <el-button link type="primary" size="large" @click="closeTask(scope.row.id)">Remediate</el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-card>
+            </el-col>
+            <el-col :xs="24" :md="12">
+              <el-card class="queue-card">
+                <template #header>
+                  <div class="card-header">
+                    <span>Remediated findings</span>
+                    <el-tag type="success" effect="plain">{{ tasks.closedTasks.length }}</el-tag>
+                  </div>
+                </template>
+                <el-table :data="tasks.closedTasks" empty-text="No remediated findings yet">
+                  <el-table-column prop="title" label="Finding" />
+                </el-table>
+              </el-card>
+            </el-col>
+          </el-row>
+        </div>
       </div>
     </template>
   </authenticator>
