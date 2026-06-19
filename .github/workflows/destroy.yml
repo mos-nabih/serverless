@@ -1,36 +1,59 @@
-name: Destroy API resources
+name: Destroy cloud resources
 
-on:
-  workflow_dispatch:
-    inputs:
-      confirmation:
-        description: 'Type destroy-development to confirm'
-        required: true
-        type: string
-
+on: workflow_dispatch
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-east-1
+  APP_ENVIRONMENT: development
+  SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 jobs:
+  destroy-global-infrastructure:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infrastructure
+    steps:
+      - uses: actions/checkout@v6
+      - name: Empty S3 bucket
+        run: aws s3 rm s3://${APP_ENVIRONMENT}-$(aws sts get-caller-identity --query Account --output text)-tasks-api --recursive
+      - name: Destroy global infrastructure
+        run:  aws cloudformation delete-stack --stack-name ${APP_ENVIRONMENT}-tasks
+      - name: Wait for stack deletion
+        run: aws cloudformation wait stack-delete-complete --stack-name ${APP_ENVIRONMENT}-tasks
   destroy-api:
-    if: ${{ inputs.confirmation == 'destroy-development' }}
+    needs: [destroy-global-infrastructure]
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: services/tasks_api
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: us-east-1
-      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
-
       - name: Install Serverless Framework
-        run: npm install --global serverless
-
-      - name: Remove development API
-        run: sls remove --stage development --region us-east-1 --verbose
+        run: npm install -g serverless
+      - name: Install NPM dependencies
+        run: npm install
+      - name: Destroy
+        run: sls remove --stage development --verbose
+  destroy-ui:
+    needs: [destroy-global-infrastructure]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/tasks_ui
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Install Serverless Framework
+        run: npm install -g serverless
+      - name: Install NPM dependencies
+        run: npm install
+      - name: Destroy
+        run: sls remove --stage development --verbose
